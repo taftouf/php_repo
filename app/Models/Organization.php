@@ -15,7 +15,7 @@ class Organization extends Model
         'address',
         'state',
         'city',
-        'logo ',
+        'logo',
         'timezone',
         'currency',
     ];

@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class Authenticate extends Middleware
 {
@@ -17,5 +19,19 @@ class Authenticate extends Middleware
         if (! $request->expectsJson()) {
             return route('login');
         }
+    }
+
+    public function handle($request, Closure $next, ...$guards)
+    {
+        if (!Auth::guard('api')->check()) {
+            return response()->json([
+                'success' => false,
+                'status' => 401,
+                'message' => 'Bad authorization',
+                'data' => []
+            ], 401);
+        }
+
+        return $next($request);
     }
 }

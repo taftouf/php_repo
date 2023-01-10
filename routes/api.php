@@ -4,6 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\Incident_reportController;
+use App\Http\Controllers\Api\OrganizationController;
+
 
 
 /*
@@ -19,11 +23,20 @@ use App\Http\Controllers\Api\UserController;
 
 
 Route::middleware(['api'])->group(function () {
+    //Auth
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
-    Route::get('/users', [UserController::class, 'getUsers']);
+    
+    // Event
+    Route::apiResource('events', EventController::class);
+
+    // Incident report
+    Route::apiResource('incident/report', Incident_reportController::class);
+
+    // organization
+    Route::apiResource('organizations', OrganizationController::class);
 });
 
 
