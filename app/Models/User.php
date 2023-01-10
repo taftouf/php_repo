@@ -9,10 +9,31 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\NewAccessToken;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -73,15 +94,4 @@ class User extends Authenticatable
         return $this->hasMany(Incident_report_comment::class);
     }
     
-    public function createToken(string $name, array $abilities = ['*'])
-    {
-        $token = $this->tokens()->create([
-            'name' => $name,
-            'token' => hash('sha256', $plainTextToken = Str::random(240)),
-            'abilities' => $abilities,
-            'expired_at' => now()->addMinutes(10) 
-        ]);
-
-        return new NewAccessToken($token, $plainTextToken);
-    }
 }

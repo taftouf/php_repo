@@ -17,19 +17,14 @@ use App\Http\Controllers\Api\UserController;
 |
 */
 
-// Public Route
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
-// Route::get('/users', [UserController::class, 'getUsers']);
-//Private Route
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    
+Route::middleware(['api'])->group(function () {
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+    Route::get('/users', [UserController::class, 'getUsers']);
 });
 
-Route::group(['middleware' => ['auth:sanctum']], function() {
-    Route::get('/users/profile', function () {
-        return "test";
-    });
-});
+
 
