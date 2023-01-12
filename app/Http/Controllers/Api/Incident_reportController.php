@@ -21,7 +21,7 @@ class Incident_reportController extends Controller
             return response()->json([
                 'success' => true,
                 'status' => 200,
-                'data' => $data,
+                'data' => ['incident_reports' => $data],
                 'count' => $data->count()
             ], 200);
         } catch (\Throwable $th) {
@@ -110,11 +110,13 @@ class Incident_reportController extends Controller
     {
         try{
             $data = Incident_report::where('id', $id)->first();
-            
+            $incident_report_comments = Incident_report::find($id)->incident_report_comments;
+
             return response()->json([
                 'success' => true,
                 'status' => 200,
-                'data' => $data,
+                'incident_report' => $data,
+                'incident_report_comment' => $incident_report_comments,
             ], 200);
         }catch (\Throwable $th) {
             return response()->json([

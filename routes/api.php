@@ -6,8 +6,9 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\Incident_reportController;
+use App\Http\Controllers\Api\Incident_report_commentController;
 use App\Http\Controllers\Api\OrganizationController;
-
+use App\Http\Controllers\Api\ImageController;
 
 
 /*
@@ -35,8 +36,15 @@ Route::middleware(['api'])->group(function () {
     // Incident report
     Route::apiResource('incident/report', Incident_reportController::class);
 
+    //Incident report comment
+    Route::apiResource('incident/report/comment', Incident_report_commentController::class);
+   
     // organization
     Route::apiResource('organizations', OrganizationController::class);
+
+    // image
+    Route::get('file/{path}', [ImageController::class, 'getImage'])->where('path', '.*');
+
 });
 
 

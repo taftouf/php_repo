@@ -13,7 +13,7 @@ class Incident_report_comment extends Model
         'attachments',
         'comment',
         'user_id',
-        'incident_reports_id'
+        'incident_report_id',
     ];
 
 

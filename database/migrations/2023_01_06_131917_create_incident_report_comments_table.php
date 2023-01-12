@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('incident_report_comments', function (Blueprint $table) {
             $table->id();
-            $table->string('attachments');
+            $table->string('attachments')->nullable();
             $table->text('comment');
             $table->foreignId('incident_report_id')->constrained();
             $table->foreignId('user_id')->constrained();

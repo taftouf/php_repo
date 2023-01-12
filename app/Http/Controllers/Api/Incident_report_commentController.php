@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Organization;
+use App\Models\Incident_report_comment;
 use Illuminate\Support\Facades\Validator;
 
-class OrganizationController extends Controller
+
+class Incident_report_commentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,13 +17,21 @@ class OrganizationController extends Controller
      */
     public function index()
     {
-        $data = Organization::All();
-        return response()->json([
-            'success' => true,
-            'status' => 200,
-            'data' => ['organizations' => $data],
-            'count' => $data->count()
-        ], 200);
+        try{
+            $data = Incident_report_comment::All();
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'data' => ['Incident_report_comments' => $data],
+                'count' => $data->count()
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -36,14 +45,10 @@ class OrganizationController extends Controller
         try {
             $validateUser = Validator::make($request->all(), 
             [
-                'name' => 'required',
-                'description' => 'required',
-                'address' => 'required',
-                'state' => 'required',
-                'city' => 'required',
-                'logo' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-                'timezone' => 'required',
-                'currency' => 'required',
+                'comment' => 'required',
+                'attachments' => 'required|File|max:2048',
+                'user_id' => 'required',
+                'incident_report_id' => 'required',
             ]);
 
             if($validateUser->fails()){
@@ -55,21 +60,17 @@ class OrganizationController extends Controller
                 ], 403);
             }
 
-            $data = Organization::create([
-                'name' => $request->name,
-                'description' => $request->description,
-                'state' => $request->state,
-                'city' => $request->city,
-                'logo' => $request->file('logo')->store('file/orgs', 'public'),
-                'timezone' => $request->timezone,
-                'currency' => $request->currency,
-                'address' => $request->address
+            $incident_report_comment = Incident_report_comment::create([
+                'comment' => $request->comment,
+                'attachments' => $request->file('attachments')->store('file/report_comment', 'public'),
+                'incident_report_id' =>   $request->incident_report_id,
+                'user_id' =>  $request->user_id,
             ]);
 
             return response()->json([
                 'success' => true,
                 'status' => 200,
-                'data' => ['organization' => $data]
+                'data' => ['incident_report_comment' => $incident_report_comment]
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -88,20 +89,13 @@ class OrganizationController extends Controller
      */
     public function show($id)
     {
-        try {
+        try{
+            $data = Incident_report_comment::where('id', $id)->first();
 
-            $org = Organization::where('id', $id)->first();
-            $users = Organization::find($id)->users;
-            $incident_reports = Organization::find($id)->incident_reports;
-            
             return response()->json([
                 'success' => true,
                 'status' => 200,
-                'data' => [
-                    'organization' => $org,
-                    'users' => $users,
-                    'incident_reports' => $incident_reports,
-                ],
+                'data' => ['Incident_report_comment' => $data],
             ], 200);
         }catch (\Throwable $th) {
             return response()->json([
@@ -122,23 +116,19 @@ class OrganizationController extends Controller
     public function update(Request $request, $id)
     {
         try{
-            $data = Organization::find($id);
+            $data = Incident_report_comment::find($id);
 
-            $data->name = $request->name ? $request->name : $data->name;
-            $data->address = $request->address ? $request->address : $data->address;
-            $data->description = $request->description ? $request->description :  $data->description;
-            $data->state = $request->state ? $request->state : $data->state;
-            $data->city = $request->city ? $request->city : $data->city;
-            $data->logo = $request->logo ? $request->logo : $data->logo;
-            $data->timezone = $request->timezone ? $request->timezone : $data->timezone;
-            $data->currency = $request->currency ? $request->currency : $data->currency;
+            $data->comment = $request->comment ? $request->comment : $data->comment;
+            $data->attachments = $request->attachments ? $request->attachments : $data->attachments;
+            $data->user_id = $request->user_id ? $request->user_id : $data->user_id;
+            $data->incident_report_id = $request->incident_report_id ? $request->incident_report_id : $data->incident_report_id;
             
             $data->save();
             
             return response()->json([
                 'success' => true,
                 'status' => 200,
-                'data' => ['organization' => $data],
+                'data' => $data,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -158,7 +148,7 @@ class OrganizationController extends Controller
     public function destroy($id)
     {
         try{
-            $data = Organization::destroy($id);
+            $data = Incident_report_comment::destroy($id);
             if($data)
                 return response()->json([
                     'success' => true,
