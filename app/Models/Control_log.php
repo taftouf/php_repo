@@ -10,10 +10,11 @@ class Control_log extends Model
     use HasFactory;
 
     protected $fillable = [
-        'control_id',
-        'organization_id',
-        'assignedTo',
-        'assignedTo'
+        'control_submission_id',
+        'user_id',
+        'type',
+        'comment',
+        'attachments'
     ];
 
     public function organization()

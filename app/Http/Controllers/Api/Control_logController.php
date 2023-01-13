@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Organization;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Control_log;
 use Illuminate\Support\Facades\Storage;
 
-class OrganizationController extends Controller
+class Control_logController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,12 +17,12 @@ class OrganizationController extends Controller
      */
     public function index()
     {
-        $data = Organization::All();
+        $data = Control_log::All();
+
         return response()->json([
             'success' => true,
             'status' => 200,
-            'data' => ['organizations' => $data],
-            'count' => $data->count()
+            'data' => $data,
         ], 200);
     }
 
@@ -37,14 +37,11 @@ class OrganizationController extends Controller
         try {
             $validateUser = Validator::make($request->all(), 
             [
-                'name' => 'required',
-                'description' => 'required',
-                'address' => 'required',
-                'state' => 'required',
-                'city' => 'required',
-                'logo' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-                'timezone' => 'required',
-                'currency' => 'required',
+                'comment' => 'required',
+                'attachments' => 'required|File|max:2048',
+                'user_id' => 'required',
+                'control_submission_id' => 'required',
+                'type' => 'required'
             ]);
 
             if($validateUser->fails()){
@@ -56,21 +53,18 @@ class OrganizationController extends Controller
                 ], 403);
             }
 
-            $data = Organization::create([
-                'name' => $request->name,
-                'description' => $request->description,
-                'state' => $request->state,
-                'city' => $request->city,
-                'logo' => $request->file('logo')->store('file/orgs', 'public'),
-                'timezone' => $request->timezone,
-                'currency' => $request->currency,
-                'address' => $request->address
+            $data = Control_log::create([
+                'comment' => $request->comment,
+                'attachments' => $request->file('attachments')->store('file/control_log', 'public'),
+                'control_submission_id' =>   $request->control_submission_id,
+                'user_id' =>  $request->user_id,
+                'type' =>  $request->type,
             ]);
 
             return response()->json([
                 'success' => true,
                 'status' => 200,
-                'data' => ['organization' => $data]
+                'data' => $data
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -89,13 +83,13 @@ class OrganizationController extends Controller
      */
     public function show($id)
     {
-        try {
-            
-            $data = Organization::where('id', $id)->with('users', 'incident_reports')->get();
+        try{
+            $data = Control_log::where('id', $id)->first();
+
             return response()->json([
                 'success' => true,
                 'status' => 200,
-                'data' => $data
+                'data' => $data,
             ], 200);
         }catch (\Throwable $th) {
             return response()->json([
@@ -116,23 +110,20 @@ class OrganizationController extends Controller
     public function update(Request $request, $id)
     {
         try{
-            $data = Organization::find($id);
+            $data = Control_log::find($id);
 
-            $data->name = $request->name ? $request->name : $data->name;
-            $data->address = $request->address ? $request->address : $data->address;
-            $data->description = $request->description ? $request->description :  $data->description;
-            $data->state = $request->state ? $request->state : $data->state;
-            $data->city = $request->city ? $request->city : $data->city;
-            $data->logo = $request->logo ? $request->logo : $data->logo;
-            $data->timezone = $request->timezone ? $request->timezone : $data->timezone;
-            $data->currency = $request->currency ? $request->currency : $data->currency;
+            $data->comment = $request->comment ? $request->comment : $data->comment;
+            $data->type = $request->type ? $request->type : $data->type;
+            // $data->attachments = $request->attachments ? $request->attachments : $data->attachments;
+            $data->user_id = $request->user_id ? $request->user_id : $data->user_id;
+            $data->control_submission_id = $request->control_submission_id ? $request->control_submission_id : $data->control_submission_id;
             
             $data->save();
             
             return response()->json([
                 'success' => true,
                 'status' => 200,
-                'data' => ['organization' => $data],
+                'data' => $data,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -152,9 +143,9 @@ class OrganizationController extends Controller
     public function destroy($id)
     {
         try{
-            $path = Organization::find($id)->logo;
+            $path = Control_log::find($id)->attachments;
             Storage::delete('public/'.$path);
-            $data = Organization::destroy($id);
+            $data = Control_log::destroy($id);
             if($data)
                 return response()->json([
                     'success' => true,

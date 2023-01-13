@@ -13,7 +13,7 @@ class Control_submission extends Model
         'control_id',
         'organization_id',
         'assignedTo',
-        'assignedTo'
+        'riskLevel'
     ];
 
     public function organization()

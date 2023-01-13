@@ -1,14 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Api;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\EventController;
-use App\Http\Controllers\Api\Incident_reportController;
-use App\Http\Controllers\Api\Incident_report_commentController;
-use App\Http\Controllers\Api\OrganizationController;
-use App\Http\Controllers\Api\ImageController;
 
 
 /*
@@ -44,6 +39,25 @@ Route::middleware(['api'])->group(function () {
 
     // image
     Route::get('file/{path}', [ImageController::class, 'getImage'])->where('path', '.*');
+
+    // Questionnaire
+    Route::apiResource('questionnaire', QuestionnaireController::class);
+
+    // Answers
+    Route::post('organization/{org_id}/user/{user_id}/answers', [AnswerController::class, 'set_user_answers']);
+    Route::get('organization/{org_id}/user/{user_id}/answers', [AnswerController::class, 'get_user_answers']);
+
+    // Framework
+    Route::apiResource('framework', FrameworkController::class);
+
+    // Control
+    Route::apiResource('control', ControlController::class);
+
+    // control_log
+    Route::apiResource('log/control', Control_logController::class);
+
+    // control_submission
+    Route::apiResource('submission/control', Control_submissionController::class);
 
 });
 

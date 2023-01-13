@@ -45,4 +45,11 @@ class Organization extends Model
     {
         return $this->hasMany(Control_submission::class);
     }
+
+    public function questionnaires()
+    {
+        return $this->belongsToMany(Questionnaire::class)
+            ->withTimestamps()
+            ->withPivot(['user_id', 'answers']);
+    }
 }

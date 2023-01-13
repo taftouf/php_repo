@@ -11,7 +11,7 @@ class Questionnaire extends Model
 
     protected $fillable = [
         'question',
-        'answer',
+        'answers',
         'isMultiple'
     ];
 
@@ -19,6 +19,6 @@ class Questionnaire extends Model
     {
         return $this->belongsToMany(Organization::class)
             ->withTimestamps()
-            ->withPivot(['user_id']);
-    }
+            ->withPivot(['user_id', 'answers']);
+    } 
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Incident_report_comment;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 
 class Incident_report_commentController extends Controller
@@ -119,7 +120,7 @@ class Incident_report_commentController extends Controller
             $data = Incident_report_comment::find($id);
 
             $data->comment = $request->comment ? $request->comment : $data->comment;
-            $data->attachments = $request->attachments ? $request->attachments : $data->attachments;
+            // $data->attachments = $request->attachments ? $request->attachments : $data->attachments;
             $data->user_id = $request->user_id ? $request->user_id : $data->user_id;
             $data->incident_report_id = $request->incident_report_id ? $request->incident_report_id : $data->incident_report_id;
             
@@ -148,6 +149,8 @@ class Incident_report_commentController extends Controller
     public function destroy($id)
     {
         try{
+            $path = Incident_report_comment::find($id)->attachments;
+            Storage::delete('public/'.$path);
             $data = Incident_report_comment::destroy($id);
             if($data)
                 return response()->json([
