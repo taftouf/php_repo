@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Questionnaire;
 use App\Models\Organization;
-
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class AnswerController extends Controller
@@ -53,11 +53,13 @@ class AnswerController extends Controller
 
     public function get_user_answers($org_id, $user_id){
         try{
-            $org = Organization::find(2);
-             
-             $data = $org->with('questionnaires')->find($org_id);
 
-            return $data->questionnaires;
+            $data = DB::select('select * from organization_questionnaire where user_id='.$user_id.' and organization_id='.$org_id);
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'data' => $data
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'success' => false,

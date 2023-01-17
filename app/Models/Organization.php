@@ -49,6 +49,7 @@ class Organization extends Model
     public function questionnaires()
     {
         return $this->belongsToMany(Questionnaire::class)
+            ->using(PrimaryPivot::class)
             ->withTimestamps()
             ->withPivot(['user_id', 'answers']);
     }

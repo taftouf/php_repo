@@ -15,9 +15,14 @@ class Questionnaire extends Model
         'isMultiple'
     ];
 
+    protected $casts = [
+        'answers' => 'array',
+    ];
+
     public function organizations()
     {
         return $this->belongsToMany(Organization::class)
+            ->using(PrimaryPivot::class)
             ->withTimestamps()
             ->withPivot(['user_id', 'answers']);
     } 
