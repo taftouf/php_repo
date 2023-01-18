@@ -138,6 +138,7 @@ class QuestionnaireController extends Controller
     public function destroy($id)
     {
         try{
+            Questionnaire::find($id)->organizations()->detach();
             $data = Questionnaire::destroy($id);
             if($data)
                 return response()->json([

@@ -22,21 +22,41 @@ class AnswerController extends Controller
             $questionnaire = Questionnaire::all();
             $data = json_decode($request->getContent());
 
-            for ($i=0; $i < $questionnaire->count(); $i++) { 
-                if($questionnaire[$i]->id == $data[$i]->question_id){
-                    $questionnaire[$i]->organizations()->attach($org_id, [
-                        "user_id" => $user_id,
-                        "answers" => $data[$i]->answers
-                    ]);
-                }else
+            if($questionnaire->count() != count($data)){
+                return response()->json([
+                            'success' => false,
+                            'status' => 403,
+                            'message' => 'invalid data'
+                        ], 403);
+            }
+    
+            $i = 0;
+            while (count($data) > $i) {
+                if(!$questionnaire->find($data[$i]->question_id)){
                     return response()->json([
                         'success' => false,
                         'status' => 403,
                         'message' => 'invalid data'
                     ], 403);
-                
+                }else if(($questionnaire->find($data[$i]->question_id)->isMultiple == 0 && count($data[$i]->answers) != 1) || count($data[$i]->answers) < 1){
+                    return response()->json([
+                        'success' => false,
+                        'status' => 403,
+                        'message' => 'invalid data'
+                    ], 403);
+                }
+                $i++;
             }
-           
+            
+            $i = 0;
+            while (count($data) > $i) {
+                $questionnaire->find($data[$i]->question_id)->organizations()->attach($org_id, [
+                    "user_id" => $user_id,
+                    "answers" => $data[$i]->answers
+                ]);
+                $i++;
+            } 
+            
             return response()->json([
                 'success' => true,
                 'status' => 200,

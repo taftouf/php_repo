@@ -154,6 +154,7 @@ class OrganizationController extends Controller
         try{
             $path = Organization::find($id)->logo;
             Storage::delete('public/'.$path);
+            
             $data = Organization::destroy($id);
             if($data)
                 return response()->json([
