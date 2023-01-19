@@ -25,7 +25,7 @@ class AuthController extends Controller
                 'firstName' => 'required',
                 'lastName' => 'required',
                 'phone' => 'required',
-                'organization_id' => 'required',
+                // 'organization_id' => 'required',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required'
             ]);
@@ -43,7 +43,7 @@ class AuthController extends Controller
                 'lastName' => $request->lastName,
                 'phone' => $request->phone,
                 'role' => "admin",
-                'organization_id' =>$request->organization_id,
+                'organization_id' => 1,
                 'email' => $request->email,
                 'password' => Hash::make($request->password)
             ]);
@@ -103,7 +103,10 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Successfully logged out'
+        ]);
     }
     
     public function refresh()
@@ -121,6 +124,14 @@ class AuthController extends Controller
             'access_token' => auth()->login($user),
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL()
+        ]);
+    }
+
+    public function sessions(){
+        return response()->json([
+            'status' => 200,
+            'success' => true,
+            'user' => User::find(auth()->user()->id)
         ]);
     }
 
